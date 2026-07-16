@@ -2,7 +2,7 @@
 package com.mycompany.edstatuschecker;
 
 /**
- * @author wayne https://ed-server-status.orerve.net/ {"status": "Maintenance", "message": "", "code": 0, "product": "FORC-FDEV-DO-1000"}
+ * https://ed-server-status.orerve.net/ {"status": "Maintenance", "message": "", "code": 0, "product": "FORC-FDEV-DO-1000"}
  *
  * Perhaps provide the following as parameters to the application
  * URL to check

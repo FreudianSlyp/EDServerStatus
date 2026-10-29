@@ -72,8 +72,6 @@ public class EDStatusChecker {
 
                         case Integer s when s >= 100 && s <= 199 ->
                             "Information Only";
-                        case Integer s when s >= 200 && s <= 299 ->
-                            "OK";
                         case Integer s when s >= 300 && s <= 399 ->
                             "Redirect";
                         case 400 ->
@@ -93,6 +91,8 @@ public class EDStatusChecker {
                     };
 
                     System.err.println(String.format("%s : A problem occurred whilst trying to query the server %s. status code %d, message %s", LocalDateTime.now().format(formatter), s_serverURL, responseCode, responseMessage));
+
+                    // set lastStatus to indicate we had a proble and that we should bleat about it
                     s_lastStatus = "Problem Occurred";
 
                 } else {
@@ -105,6 +105,8 @@ public class EDStatusChecker {
                         String currentStatus = map.get(s_searchKey).toString();
                         if (!currentStatus.equals(s_lastStatus)) {
                             System.out.println(String.format("%s : \"%s\" has changed, it's now : %s", LocalDateTime.now().format(formatter), s_searchKey, currentStatus));
+
+                            // Reset the lastStatus so we get new failiure reports if they happen after a successful connection
                             s_lastStatus = currentStatus;
                         }
 
@@ -114,9 +116,12 @@ public class EDStatusChecker {
                     }
                 }
 
-            } catch (IOException | InterruptedException ex) {
+            } catch (Exception ex) {
 
-                System.err.println(String.format("%s : A problem occurred whilst trying to query the server %s. message %s", LocalDateTime.now().format(formatter), s_serverURL, ex.getMessage()));
+                // if the lastStatus is a problem, we dont need to alert on it again
+                if (!s_lastStatus.equals("Problem Occurred")) {
+                    System.err.println(String.format("%s : A problem occurred whilst trying to query the server %s. message %s", LocalDateTime.now().format(formatter), s_serverURL, ex.getMessage()));
+                }
 
                 // set the last status message so it gets reported and updated
                 s_lastStatus = "Problem Occurred";
@@ -128,7 +133,8 @@ public class EDStatusChecker {
 
             response = null;
 
-        }, 0, s_delayTimeSecs, TimeUnit.SECONDS);
+        }, 0, s_delayTimeSecs, TimeUnit.SECONDS
+        );
 
     }
 
